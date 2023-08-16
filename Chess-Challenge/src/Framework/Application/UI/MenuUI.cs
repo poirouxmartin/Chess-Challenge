@@ -21,14 +21,26 @@ namespace ChessChallenge.Application
                 var blackType = !controller.HumanWasWhiteLastGame ? ChallengeController.PlayerType.MyBot : ChallengeController.PlayerType.Human;
                 controller.StartNewGame(whiteType, blackType);
             }
+            if (NextButtonInRow("Human vs EvilBotT2", ref buttonPos, spacing, buttonSize))
+            {
+                var whiteType = controller.HumanWasWhiteLastGame ? ChallengeController.PlayerType.EvilBot_T2 : ChallengeController.PlayerType.Human;
+                var blackType = !controller.HumanWasWhiteLastGame ? ChallengeController.PlayerType.EvilBot_T2 : ChallengeController.PlayerType.Human;
+                controller.StartNewGame(whiteType, blackType);
+            }
             if (NextButtonInRow("MyBot vs MyBot", ref buttonPos, spacing, buttonSize))
-            {
                 controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.MyBot);
-            }
             if (NextButtonInRow("MyBot vs EvilBot", ref buttonPos, spacing, buttonSize))
-            {
                 controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.EvilBot);
-            }
+            if (NextButtonInRow("MyBot vs EvilBotT1", ref buttonPos, spacing, buttonSize))
+                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.EvilBot_T1);
+            if (NextButtonInRow("MyBot vs EvilBotT2", ref buttonPos, spacing, buttonSize))
+                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.EvilBot_T2);
+            if (NextButtonInRow("MyBot vs MyBot_v1", ref buttonPos, spacing, buttonSize))
+                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.MyBot_v1);
+            if (NextButtonInRow("MyBot vs MyBot_v2", ref buttonPos, spacing, buttonSize))
+                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.MyBot_v2);
+            if (NextButtonInRow("MyBot vs Stockfish", ref buttonPos, spacing, buttonSize))
+                controller.StartNewBotMatch(ChallengeController.PlayerType.MyBot, ChallengeController.PlayerType.Stockfish_Bot);
 
             // Page buttons
             buttonPos.Y += breakSpacing;
@@ -54,6 +66,10 @@ namespace ChessChallenge.Application
             if (NextButtonInRow("Submission Page", ref buttonPos, spacing, buttonSize))
             {
                 FileHelper.OpenUrl("https://forms.gle/6jjj8jxNQ5Ln53ie6");
+            }
+            if (NextButtonInRow("Fast forward", ref buttonPos, spacing, buttonSize))
+            {
+                controller.fastForward = !controller.fastForward;
             }
 
             // Window and quit buttons

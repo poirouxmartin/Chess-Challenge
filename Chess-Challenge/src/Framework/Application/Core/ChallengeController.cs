@@ -19,7 +19,12 @@ namespace ChessChallenge.Application
         {
             Human,
             MyBot,
-            EvilBot
+            MyBot_v1,
+            MyBot_v2,
+            EvilBot,
+            EvilBot_T1,
+            EvilBot_T2,
+            Stockfish_Bot
         }
 
         // Game state
@@ -55,11 +60,13 @@ namespace ChessChallenge.Application
         readonly int tokenCount;
         readonly int debugTokenCount;
         readonly StringBuilder pgns;
+        public bool fastForward;
 
         public ChallengeController()
         {
             Log($"Launching Chess-Challenge version {Settings.Version}");
             (tokenCount, debugTokenCount) = GetTokenCount();
+            Log($"Bot brain capacity: {tokenCount} / {MaxTokenCount} tokens", false, ConsoleColor.Yellow);
             Warmer.Warm();
 
             rng = new Random();
@@ -67,6 +74,7 @@ namespace ChessChallenge.Application
             boardUI = new BoardUI();
             board = new Board();
             pgns = new();
+            fastForward = false;
 
             BotStatsA = new BotMatchStats("IBot");
             BotStatsB = new BotMatchStats("IBot");
@@ -209,7 +217,12 @@ namespace ChessChallenge.Application
             return type switch
             {
                 PlayerType.MyBot => new ChessPlayer(new MyBot(), type, GameDurationMilliseconds),
+                PlayerType.MyBot_v1 => new ChessPlayer(new MyBotV1(), type, GameDurationMilliseconds),
+                PlayerType.MyBot_v2 => new ChessPlayer(new MyBotV2(), type, GameDurationMilliseconds),
                 PlayerType.EvilBot => new ChessPlayer(new EvilBot(), type, GameDurationMilliseconds),
+                PlayerType.EvilBot_T1 => new ChessPlayer(new EvilBotT1(), type, GameDurationMilliseconds),
+                PlayerType.EvilBot_T2 => new ChessPlayer(new EvilBotT2(), type, GameDurationMilliseconds),
+                PlayerType.Stockfish_Bot => new ChessPlayer(new StockfishBot(), type, GameDurationMilliseconds),
                 _ => new ChessPlayer(new HumanPlayer(boardUI), type)
             };
         }
@@ -297,16 +310,24 @@ namespace ChessChallenge.Application
                     if (botMatchGameIndex < numGamesToPlay && autoStartNextBotMatch)
                     {
                         botAPlaysWhite = !botAPlaysWhite;
-                        const int startNextGameDelayMs = 600;
-                        System.Timers.Timer autoNextTimer = new(startNextGameDelayMs);
-                        int originalGameID = gameID;
-                        autoNextTimer.Elapsed += (s, e) => AutoStartNextBotMatchGame(originalGameID, autoNextTimer);
-                        autoNextTimer.AutoReset = false;
-                        autoNextTimer.Start();
 
+                        if (fastForward)
+                        {
+                            StartNewGame(PlayerBlack.PlayerType, PlayerWhite.PlayerType);
+                        } 
+                        else
+                        {
+                            const int startNextGameDelayMs = 600;
+                            System.Timers.Timer autoNextTimer = new(startNextGameDelayMs);
+                            int originalGameID = gameID;
+                            autoNextTimer.Elapsed += (s, e) => AutoStartNextBotMatchGame(originalGameID, autoNextTimer);
+                            autoNextTimer.AutoReset = false;
+                            autoNextTimer.Start();
+                        }
                     }
                     else if (autoStartNextBotMatch)
                     {
+                        fastForward = false;
                         Log("Match finished", false, ConsoleColor.Blue);
                     }
                 }
@@ -352,31 +373,41 @@ namespace ChessChallenge.Application
 
         public void Update()
         {
-            if (isPlaying)
-            {
-                PlayerWhite.Update();
-                PlayerBlack.Update();
 
-                PlayerToMove.UpdateClock(Raylib.GetFrameTime());
-                if (PlayerToMove.TimeRemainingMs <= 0)
+            do
+            {
+                if (isPlaying)
                 {
-                    EndGame(PlayerToMove == PlayerWhite ? GameResult.WhiteTimeout : GameResult.BlackTimeout);
-                }
-                else
-                {
-                    if (isWaitingToPlayMove && Raylib.GetTime() > playMoveTime)
+                    PlayerWhite.Update();
+                    PlayerBlack.Update();
+
+                    PlayerToMove.UpdateClock(Raylib.GetFrameTime() + MinMoveDelay);
+                    if (PlayerToMove.TimeRemainingMs <= 0)
                     {
-                        isWaitingToPlayMove = false;
-                        PlayMove(moveToPlay);
+                        EndGame(PlayerToMove == PlayerWhite ? GameResult.WhiteTimeout : GameResult.BlackTimeout);
+                    }
+                    else
+                    {
+                        if (isWaitingToPlayMove && (Raylib.GetTime() >= playMoveTime || fastForward))
+                        {
+                            isWaitingToPlayMove = false;
+                            PlayMove(moveToPlay);
+                        }
                     }
                 }
-            }
 
-            if (hasBotTaskException)
-            {
-                hasBotTaskException = false;
-                botExInfo.Throw();
-            }
+                if (hasBotTaskException)
+                {
+                    hasBotTaskException = false;
+                    botExInfo.Throw();
+                }
+
+                if(PlayerWhite.IsHuman || PlayerBlack.IsHuman)
+                {
+                    fastForward = false;
+                }
+
+            } while (fastForward && isWaitingToPlayMove);
         }
 
         public void Draw()
