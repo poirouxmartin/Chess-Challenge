@@ -21,6 +21,16 @@ The same author writes [OptiChess / GrogrosZero](https://github.com/poirouxmarti
 a full C++ engine with its own search, evaluation and interface, which shares nothing with this
 entry beyond the name.
 
+## The entry
+
+[`src/My Bot/MyBot.cs`](Chess-Challenge/src/My%20Bot/MyBot.cs) — negamax with alpha-beta, null
+move pruning, a quiescence search with stand-pat and delta-free capture ordering, and move
+ordering by static evaluation. The file was removed from this branch during the challenge and
+restored in 2026 from the local copy of that period, so read it as the working state of the
+bot, not as a byte-exact record of the submitted file. Its own TODO list, kept as it was, is a
+fair summary of what it never got: transposition table, iterative deepening, killer moves and
+any real time management.
+
 ## What is in this fork
 
 The default branch is `develop`, which carries the work; `main` is the upstream project as
