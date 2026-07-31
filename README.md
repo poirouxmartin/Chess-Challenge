@@ -1,3 +1,42 @@
+# Tiny Chess Bot Challenge — entry "Grogros"
+
+My entry to [Sebastian Lague's Tiny Chess Bot Challenge](https://youtu.be/iScy18pVR58) (2023):
+a chess bot in C#, written against the framework in this repository under a hard code-size
+limit of 1024 tokens — no external dependencies, no opening book, no tablebases.
+
+**Ranked 54th of 624 entries** in the
+[official results](https://github.com/SebLague/Tiny-Chess-Bot-Challenge-Results/blob/main/RatingsList.txt):
+
+```
+Rank Name                        Elo    +    - games score oppo. draws
+  54 Grogros (by: Grobert)      1953   72   72   128   30%  2140   10%
+```
+
+Two caveats worth stating, since the file states them itself: entries are ranked there by
+BayesElo rating rather than by their placement in the tournament, and the ratings are anchored
+so that the winning bot matches its CCRL Blitz rating. The number is not comparable to a human
+elo, nor to the rating of a full engine — the whole bot has to fit in a kilobyte of code.
+
+The same author writes [OptiChess / GrogrosZero](https://github.com/poirouxmartin/opti_chess),
+a full C++ engine with its own search, evaluation and interface, which shares nothing with this
+entry beyond the name.
+
+## What is in this fork
+
+The default branch is `develop`, which carries the work; `main` is the upstream project as
+forked.
+
+- **A fast-forward button for 1000 games** — the main addition to the framework. See the
+  section below: it repeats `ChallengeController.Update()` until the game limit is reached
+  without drawing the board and without the delays, which turns an overnight benchmark into a
+  coffee break. Build in release mode, and set `RunBotsOnSeparateThread` to `false` in
+  `Settings.cs` or only the delays are skipped.
+- **Benchmark opponents** — the community reference bots (`EvilBot_T1`, `EvilBot_T2`) and a
+  Stockfish-driven opponent (`Stockfish_Bot.cs`), used as calibrated sparring partners to
+  measure a change in the bot rather than guess at it.
+
+---
+
 # Fast forward 1000 games button implementation
 The fast forward works by repeating the ChallengeController's Update() function until the game limit is reached without drawing the board, and skipping all the delays.
 Make sure to build the project in release mode for a faster skip.
