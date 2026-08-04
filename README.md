@@ -4,6 +4,11 @@ My entry to [Sebastian Lague's Tiny Chess Bot Challenge](https://youtu.be/iScy18
 a chess bot in C#, written against the framework in this repository under a hard code-size
 limit of 1024 tokens — no external dependencies, no opening book, no tablebases.
 
+Submitted under the bot name **`Grogros`** and the handle **`Grobert`** — both mine, which is
+what to look for in the results file below. The name carries over to `GrogrosZero`, the search
+in [`opti_chess`](https://github.com/poirouxmartin/opti_chess), and to
+[`Grogros_Zero`](https://lichess.org/@/Grogros_Zero) on Lichess; the code does not.
+
 **Ranked 54th of 624 entries** in the
 [official results](https://github.com/SebLague/Tiny-Chess-Bot-Challenge-Results/blob/main/RatingsList.txt):
 
